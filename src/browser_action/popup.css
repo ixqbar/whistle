@@ -1,0 +1,97 @@
+@font-face { font-family: "Xingqiba"; src: url('../fonts/pt.ttf'); }
+body {
+    font-family: Xingqiba;
+}
+
+label {
+    margin-right:5px;
+    font-size: 15px;
+    font-weight:bold;
+}
+
+button {
+    cursor: pointer;
+    display:inline-block;
+}
+
+.button-enabled {
+    width:60px;
+    height:30px;
+    border-radius:5px; 
+    background-color: #ff8939;
+    color: white;
+    outline: none;
+    font-size: 18px;
+}
+
+.button-disabled {
+    width:60px;
+    height:30px;
+    border-radius:5px; 
+    background-color: rgb(160, 132, 132);
+    color: white;
+    outline: none;
+    font-size: 18px;
+}
+
+span {
+    font-size: 12px;
+}
+
+ul {
+    margin: 0;
+    padding: 0;
+}
+
+ul li {
+  list-style: none;
+  margin: 5px 0 0 10px;
+  line-height: 25px;
+  font-size: 18px;
+  line-break: auto;
+}
+
+ul li button {
+    display: inline-block;
+    float: right;
+    margin-right: 20px;
+    height: 25px;
+    width: 50px;
+    color: red;
+    font-size: 14px;
+    border-radius:15px;
+}
+
+#server {
+    cursor: pointer;
+}
+
+#options {
+    position:absolute;
+    bottom:100px;
+    left:50px;
+    background-color: antiquewhite;
+    padding: 10px;
+    display: none;
+    z-index: 999;
+}
+
+#options div {
+    width: 400px;
+    margin: 5px auto;
+}
+
+#options input {
+    height: 35px;
+    font-size: 18px;
+}
+
+#options button {
+    width:150px;
+    height:35px;
+    border-radius:5px; 
+    background-color: #ff8939;
+    color: white;
+    outline: none;
+    font-size: 18px;
+}

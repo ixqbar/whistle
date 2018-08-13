@@ -1,0 +1,25 @@
+{
+    "manifest_version": 2,
+    "name": "提醒通知",
+    "version": "0.0.2",
+    "description": "提醒通知 QQ-174171262",
+    "icons": { 
+        "16": "images/icon.png",
+        "48": "images/icon.png",
+        "128": "images/icon.png" 
+    },
+    "permissions": [
+        "storage",
+        "notifications"
+    ],
+    "browser_action": {
+        "default_icon": "images/icon.png",
+        "default_title": "提醒通知",
+        "default_popup": "browser_action/popup.html"
+    },
+    "background" : {
+        "scripts" : [
+            "background.js"
+        ]
+    }
+}
