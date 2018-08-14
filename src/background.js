@@ -127,7 +127,13 @@ chrome.storage.local.get(['servers', 'defaultServer'], function(result){
 });
 
 chrome.notifications.onClosed.addListener(function(notificationId, byUserCanceled){
-    console.log("closed:", notificationId, byUserCanceled);
+    console.log("notification close:", notificationId, byUserCanceled);
+    chrome.tabs.create({"url":"browser_action/popup.html"});
+});
+
+chrome.notifications.onClicked.addListener(function(notificationId, buttonIndex){
+    console.log("notification clicked:", notificationId, buttonIndex);
+    chrome.tabs.create({"url":"browser_action/popup.html"});
 });
 
 chrome.runtime.onMessage.addListener(function(request, sender, sendResponse) {

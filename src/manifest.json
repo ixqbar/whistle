@@ -3,12 +3,15 @@
     "name": "提醒通知",
     "version": "0.0.2",
     "description": "提醒通知 QQ-174171262",
+    "author":"xingqiba",
+    "homepage_url":"https://www.ixqbar.com/",
     "icons": { 
         "16": "images/icon.png",
         "48": "images/icon.png",
         "128": "images/icon.png" 
     },
     "permissions": [
+        "tabs",
         "storage",
         "notifications"
     ],
