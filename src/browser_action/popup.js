@@ -140,13 +140,12 @@ $(function(){
                 || typeof response['state'] == 'undefined' 
                 || response['state'] != 'ok') {
                 $('#selectTargetServer option[value=' + currentTargetServer + ']').attr('selected', 'selected');
-                $('#doSave').removeClass('button-enabled').addClass('button-disabled').attr('disabled','disabled');
-                $('#doDelete').removeClass('button-enabled').addClass('button-disabled').attr('disabled','disabled');
-                return;
             } else {
-                $('#output').val('');
                 currentTargetServer = selectTargetServer;
             }
+
+            $('#doSave').removeClass('button-enabled').addClass('button-disabled').attr('disabled','disabled');
+            $('#doDelete').removeClass('button-enabled').addClass('button-disabled').attr('disabled','disabled');
         });
     });
 
