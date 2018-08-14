@@ -99,9 +99,13 @@ $(function(){
             return;
         }
         
-        currentTargetServer = result.defaultServer;
-        for (var key in result.servers) {
-            $('#selectTargetServer').append('<option id="serverF'+ key +'" value="' + key + '">' + result.servers[key] + '</option>');
+        currentTargetServer = result['defaultServer'];
+        for (var key in result['servers']) {
+            if (key == currentTargetServer) {
+                $('#selectTargetServer').append('<option id="serverF'+ key +'" value="' + key + '" selected>' + result['servers'][key] + '</option>');
+            } else {
+                $('#selectTargetServer').append('<option id="serverF'+ key +'" value="' + key + '">' + result['servers'][key] + '</option>');
+            }
         }
 
         loadingDataReady = true;

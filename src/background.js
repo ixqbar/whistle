@@ -1,4 +1,4 @@
-const targetServers = {
+var targetServers = {
     "local" : "ws://127.0.0.1:8899/sock?uuid=" + chrome.runtime.id + "&proxy=0&monitor=1"
 };
 
@@ -79,7 +79,9 @@ webSocketHandler.prototype.Connect = function(callback) {
 };
 
 webSocketHandler.prototype.ReOpen = function(callback) {
-    this.ws.close();
+    if (this.ws) {
+        this.ws.close();
+    }
     this.Connect(callback);
 };
 
@@ -113,7 +115,10 @@ chrome.storage.local.get(['servers', 'defaultServer'], function(result){
        });
     }
 
-    console.log("ready to connect target server");
+    console.log("load storage data:" + JSON.stringify(result));
+    currentTargetServer = result['defaultServer'];
+    targetServers = result['servers'];
+    console.log("ready to connect target server " + targetServers[currentTargetServer]);
     setTimeout(function(){
         tryConnectTargetServer();
     }, 10000);
