@@ -22,6 +22,8 @@ function sendNotification(data) {
     db.transaction(function (tx) {
         tx.executeSql('INSERT INTO logs (title, message, date) VALUES (?, ?, ?)', [data.title, data.message, (new Date()).toString()]); 
     });
+
+    chrome.browserAction.setBadgeText({"text":"?"});
 }
 
 var webSocketHandler = function() {
@@ -140,6 +142,7 @@ chrome.runtime.onMessage.addListener(function(request, sender, sendResponse) {
                     sendResponse({"state":"ok", "logs":results.rows});
                 }, null);
             });
+            chrome.browserAction.setBadgeText({"text":""});
         break;
         case 'deleteLog':
             db.transaction(function (tx) {
