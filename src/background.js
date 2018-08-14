@@ -113,11 +113,12 @@ chrome.storage.local.get(['servers', 'defaultServer'], function(result){
        chrome.storage.local.set({'servers':targetServers, 'defaultServer': currentTargetServer}, function(){
             console.log('save default severs settings success');
        });
+    } else {
+        currentTargetServer = result['defaultServer'];
+        targetServers = result['servers'];
     }
 
     console.log("load storage data:" + JSON.stringify(result));
-    currentTargetServer = result['defaultServer'];
-    targetServers = result['servers'];
     console.log("ready to connect target server " + targetServers[currentTargetServer]);
     setTimeout(function(){
         tryConnectTargetServer();
