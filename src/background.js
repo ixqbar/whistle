@@ -83,7 +83,24 @@ webSocketHandler.prototype.ReOpen = function(callback) {
     this.Connect(callback);
 };
 
+webSocketHandler.prototype.IsOpen = function(callback) {
+    return this.opened == true;
+};
+
 var webSocket = new webSocketHandler();
+
+function tryConnectTargetServer()
+{
+    if (webSocket.IsOpen()) {
+        console.log("already connected target server " + targetServers[currentTargetServer] + " success");
+        return;
+    }
+
+    console.log("try to connect target server " + targetServers[currentTargetServer]);
+    webSocket.Connect(function(ws) {
+        console.log("connected target server " + targetServers[currentTargetServer] + " success");
+    });
+}
 
 chrome.storage.local.get(['servers', 'defaultServer'], function(result){
     if (0 == Object.keys(result).length 
@@ -96,9 +113,11 @@ chrome.storage.local.get(['servers', 'defaultServer'], function(result){
        });
     }
 
-    webSocket.Connect(function(ws) {
-        console.log("connected server:" + targetServers[currentTargetServer]);
-    });
+    console.log("ready to connect target server");
+    setTimeout(function(){
+        tryConnectTargetServer();
+    }, 10000);
+    tryConnectTargetServer();
 });
 
 chrome.notifications.onClosed.addListener(function(notificationId, byUserCanceled){
@@ -130,8 +149,9 @@ chrome.runtime.onMessage.addListener(function(request, sender, sendResponse) {
                     console.log('save default severs settings success');
                     currentTargetServer = request['selectTargetServer'];
                     webSocket.ReOpen(function(){
-                        sendResponse({"state":"ok"});
+                        console.log("connected target server " + targetServers[currentTargetServer] + " success");
                     });
+                    sendResponse({"state":"ok"});
                 });
             }
         break;
@@ -143,6 +163,7 @@ chrome.runtime.onMessage.addListener(function(request, sender, sendResponse) {
                 }, null);
             });
             chrome.browserAction.setBadgeText({"text":""});
+            tryConnectTargetServer();
         break;
         case 'deleteLog':
             db.transaction(function (tx) {
@@ -183,7 +204,7 @@ chrome.runtime.onMessage.addListener(function(request, sender, sendResponse) {
             }
         break;
         default:
-        sendResponse({"state":"fail", "message":"unknown event"});
+            sendResponse({"state":"fail", "message":"unknown event"});
         break;
     }
 
