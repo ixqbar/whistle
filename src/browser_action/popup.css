@@ -41,6 +41,8 @@ span {
 ul {
     margin: 0;
     padding: 0;
+    height: 390px;
+    overflow-y: scroll;
 }
 
 ul li {

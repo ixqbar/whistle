@@ -23,7 +23,7 @@ function sendNotification(data) {
         tx.executeSql('INSERT INTO logs (title, message, date) VALUES (?, ?, ?)', [data.title, data.message, (new Date()).toString()]); 
     });
 
-    chrome.browserAction.setBadgeText({"text":"?"});
+    chrome.browserAction.setBadgeText({"text":"!"});
 }
 
 var webSocketHandler = function() {
@@ -31,6 +31,7 @@ var webSocketHandler = function() {
     this.messages = null;
     this.opened = false;
     this.waitQueue = [];
+    this.closeQueue = [];
 };
 
 webSocketHandler.prototype.Connect = function(callback) {
@@ -60,6 +61,12 @@ webSocketHandler.prototype.Connect = function(callback) {
         console.dir(event);
         _this.ws = null;
         _this.opened = false;
+        if (_this.closeQueue.length) {
+            for (var i in _this.closeQueue) {
+                _this.closeQueue[i].call(null, _this);
+            }
+            _this.closeQueue = [];
+        }
     });
     this.ws.addEventListener('error', function(event) {
         console.dir(event);
@@ -80,9 +87,14 @@ webSocketHandler.prototype.Connect = function(callback) {
 
 webSocketHandler.prototype.ReOpen = function(callback) {
     if (this.ws) {
+        var _this = this;
+        this.closeQueue.push(function(){
+            _this.Connect(callback);
+        });
         this.ws.close();
+    } else {
+        this.Connect(callback);
     }
-    this.Connect(callback);
 };
 
 webSocketHandler.prototype.IsOpen = function(callback) {
