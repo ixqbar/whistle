@@ -1,7 +1,6 @@
 $(function(){
     console.log('popup start finished');
-
-    var addDeleteLogEvent = false;
+    
     var loadingDataReady = false;
     var loadingAnimReady = false;
     var loadingAnimRunning = false;
@@ -49,8 +48,6 @@ $(function(){
     }
 
     function deleteLogEvent() {
-        if (addDeleteLogEvent) return;
-        addDeleteLogEvent = true;
         $('#output button').click(function(){
             var id = $(this).data('id');
             toShowLoading();
@@ -218,6 +215,24 @@ $(function(){
 
     $('#server').click(function(){
         $('#options').toggle();
+    });
+
+    chrome.runtime.onMessage.addListener(function(request, sender, sendResponse) {
+        if (sender.id != chrome.runtime.id) {
+            sendResponse({"state":"fail", "message":"unknown extension id"});
+            return false;
+        }
+
+        console.log(request);
+        
+        switch (request['event']) {
+            case "refreshLogs":
+                $('#output').html('');
+                loadLogs();
+                break;
+        }
+
+        return true;
     });
 
     loadLogs();

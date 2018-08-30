@@ -145,7 +145,28 @@ chrome.notifications.onClosed.addListener(function(notificationId, byUserCancele
 
 chrome.notifications.onClicked.addListener(function(notificationId, buttonIndex){
     console.log("notification clicked:", notificationId, buttonIndex);
-    chrome.tabs.create({"url":"browser_action/popup.html"});
+    var url = chrome.extension.getURL("browser_action/popup.html");
+    chrome.windows.getAll({"populate":true}, function(windows) {
+        var existing_tab = null;
+        console.log(windows);
+        for (var i in windows) {
+            var tabs = windows[i].tabs;
+            for (var j in tabs) {
+                var tab = tabs[j];
+                if (tab.url == url) {
+                    existing_tab = tab;
+                    break;
+                }
+            }
+        }
+        if (existing_tab) {
+            chrome.tabs.update(existing_tab.id, {"highlighted":true, "active": true}, function(){
+                chrome.tabs.sendMessage(existing_tab.id, {"event":"refreshLogs"})
+            });
+        } else {
+            chrome.tabs.create({"url":url, "active":true});
+        }
+    });
 });
 
 chrome.runtime.onMessage.addListener(function(request, sender, sendResponse) {
