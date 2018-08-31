@@ -1,32 +1,34 @@
 var targetServers = {
-    "local" : "ws://127.0.0.1:8899/sock?uuid=" + chrome.runtime.id + "&proxy=0&monitor=1"
+    "local": "ws://127.0.0.1:8899/sock?uuid=" + chrome.runtime.id + "&proxy=0&monitor=1"
 };
 
 var currentTargetServer = "local";
 
 var db = openDatabase('whistle', '1.0', 'whistle DB', 2 * 1024 * 1024);
-db.transaction(function (tx) {  
-   tx.executeSql('CREATE TABLE IF NOT EXISTS logs (id INTEGER PRIMARY KEY, title VARCHAR(200) NOT NULL DEFAULT "", message TEXT NOT NULL DEFAULT "", date VARCHAR(200) NOT NULL DEFAULT "")');
+db.transaction(function (tx) {
+    tx.executeSql('CREATE TABLE IF NOT EXISTS logs (id INTEGER PRIMARY KEY, title VARCHAR(200) NOT NULL DEFAULT "", message TEXT NOT NULL DEFAULT "", date VARCHAR(200) NOT NULL DEFAULT "")');
 });
 
 function sendNotification(data) {
     chrome.notifications.create({
         "type": "basic",
-        "title":data.title,
-        "message":data.message,
-        "iconUrl":"images/icon.png"
-    }, function(notificationId){
+        "title": data.title,
+        "message": data.message,
+        "iconUrl": "images/icon.png"
+    }, function (notificationId) {
         console.log(notificationId);
     });
 
     db.transaction(function (tx) {
-        tx.executeSql('INSERT INTO logs (title, message, date) VALUES (?, ?, ?)', [data.title, data.message, (new Date()).toString()]); 
+        tx.executeSql('INSERT INTO logs (title, message, date) VALUES (?, ?, ?)', [data.title, data.message, (new Date()).toString()]);
     });
 
-    chrome.browserAction.setBadgeText({"text":"!"});
+    chrome.browserAction.setBadgeText({
+        "text": "!"
+    });
 }
 
-var webSocketHandler = function() {
+var webSocketHandler = function () {
     this.ws = null;
     this.messages = null;
     this.opened = false;
@@ -34,7 +36,7 @@ var webSocketHandler = function() {
     this.closeQueue = [];
 };
 
-webSocketHandler.prototype.Connect = function(callback) {
+webSocketHandler.prototype.Connect = function (callback) {
     if (this.ws != null) {
         if (this.opened) {
             callback.call(null, this);
@@ -46,7 +48,7 @@ webSocketHandler.prototype.Connect = function(callback) {
 
     var _this = this;
     this.ws = new WebSocket(targetServers[currentTargetServer]);
-    this.ws.addEventListener('open', function(event) {
+    this.ws.addEventListener('open', function (event) {
         _this.ws.binaryType = 'arraybuffer';
         _this.opened = true;
         callback.call(null, _this);
@@ -57,7 +59,7 @@ webSocketHandler.prototype.Connect = function(callback) {
             _this.waitQueue = [];
         }
     });
-    this.ws.addEventListener('close', function(event) {
+    this.ws.addEventListener('close', function (event) {
         console.dir(event);
         _this.ws = null;
         _this.opened = false;
@@ -68,14 +70,14 @@ webSocketHandler.prototype.Connect = function(callback) {
             _this.closeQueue = [];
         }
     });
-    this.ws.addEventListener('error', function(event) {
+    this.ws.addEventListener('error', function (event) {
         console.dir(event);
         _this.ws = null;
         _this.opened = false;
     });
-    this.ws.addEventListener('message', function(event) {
-        if (event.type != 'message'
-            || event.data.length == 0) {
+    this.ws.addEventListener('message', function (event) {
+        if (event.type != 'message' ||
+            event.data.length == 0) {
             console.log(event);
             return;
         }
@@ -85,10 +87,10 @@ webSocketHandler.prototype.Connect = function(callback) {
     });
 };
 
-webSocketHandler.prototype.ReOpen = function(callback) {
+webSocketHandler.prototype.ReOpen = function (callback) {
     if (this.ws) {
         var _this = this;
-        this.closeQueue.push(function(){
+        this.closeQueue.push(function () {
             _this.Connect(callback);
         });
         this.ws.close();
@@ -97,34 +99,36 @@ webSocketHandler.prototype.ReOpen = function(callback) {
     }
 };
 
-webSocketHandler.prototype.IsOpen = function(callback) {
+webSocketHandler.prototype.IsOpen = function (callback) {
     return this.opened == true;
 };
 
 var webSocket = new webSocketHandler();
 
-function tryConnectTargetServer()
-{
+function tryConnectTargetServer() {
     if (webSocket.IsOpen()) {
         console.log("already connected target server " + targetServers[currentTargetServer] + " success");
         return;
     }
 
     console.log("try to connect target server " + targetServers[currentTargetServer]);
-    webSocket.Connect(function(ws) {
+    webSocket.Connect(function (ws) {
         console.log("connected target server " + targetServers[currentTargetServer] + " success");
     });
 }
 
-chrome.storage.local.get(['servers', 'defaultServer'], function(result){
-    if (0 == Object.keys(result).length 
-        || typeof result['servers'] == 'undefined'
-        || result['servers'].length == 0 
-        || typeof result['defaultServer'] == 'undefined'
-        || result['defaultServer'].length == 0) {
-       chrome.storage.local.set({'servers':targetServers, 'defaultServer': currentTargetServer}, function(){
+chrome.storage.local.get(['servers', 'defaultServer'], function (result) {
+    if (0 == Object.keys(result).length ||
+        typeof result['servers'] == 'undefined' ||
+        result['servers'].length == 0 ||
+        typeof result['defaultServer'] == 'undefined' ||
+        result['defaultServer'].length == 0) {
+        chrome.storage.local.set({
+            'servers': targetServers,
+            'defaultServer': currentTargetServer
+        }, function () {
             console.log('save default severs settings success');
-       });
+        });
     } else {
         currentTargetServer = result['defaultServer'];
         targetServers = result['servers'];
@@ -132,21 +136,25 @@ chrome.storage.local.get(['servers', 'defaultServer'], function(result){
 
     console.log("load storage data:" + JSON.stringify(result));
     console.log("ready to connect target server " + targetServers[currentTargetServer]);
-    setTimeout(function(){
+    setTimeout(function () {
         tryConnectTargetServer();
     }, 10000);
     tryConnectTargetServer();
 });
 
-chrome.notifications.onClosed.addListener(function(notificationId, byUserCanceled){
+chrome.notifications.onClosed.addListener(function (notificationId, byUserCanceled) {
     console.log("notification close:", notificationId, byUserCanceled);
-    chrome.tabs.create({"url":"browser_action/popup.html"});
+    chrome.tabs.create({
+        "url": "browser_action/popup.html"
+    });
 });
 
-chrome.notifications.onClicked.addListener(function(notificationId, buttonIndex){
+chrome.notifications.onClicked.addListener(function (notificationId, buttonIndex) {
     console.log("notification clicked:", notificationId, buttonIndex);
     var url = chrome.extension.getURL("browser_action/popup.html");
-    chrome.windows.getAll({"populate":true}, function(windows) {
+    chrome.windows.getAll({
+        "populate": true
+    }, function (windows) {
         var existing_tab = null;
         console.log(windows);
         for (var i in windows) {
@@ -160,67 +168,97 @@ chrome.notifications.onClicked.addListener(function(notificationId, buttonIndex)
             }
         }
         if (existing_tab) {
-            chrome.tabs.update(existing_tab.id, {"highlighted":true, "active": true}, function(){
-                chrome.tabs.sendMessage(existing_tab.id, {"event":"refreshLogs"})
+            chrome.tabs.update(existing_tab.id, {
+                "highlighted": true,
+                "active": true
+            }, function () {
+                chrome.tabs.sendMessage(existing_tab.id, {
+                    "event": "refreshLogs"
+                })
             });
         } else {
-            chrome.tabs.create({"url":url, "active":true});
+            chrome.tabs.create({
+                "url": url,
+                "active": true
+            });
         }
     });
 });
 
-chrome.runtime.onMessage.addListener(function(request, sender, sendResponse) {
+chrome.runtime.onMessage.addListener(function (request, sender, sendResponse) {
     if (sender.id != chrome.runtime.id) {
-        sendResponse({"state":"fail", "message":"unknown extension id"});
+        sendResponse({
+            "state": "fail",
+            "message": "unknown extension id"
+        });
         return false;
     }
 
     console.dir(request);
 
     if (typeof request['event'] == 'undefined') {
-        sendResponse({"state":"fail", "message":"unknown event"});
+        sendResponse({
+            "state": "fail",
+            "message": "unknown event"
+        });
         return false;
     }
 
     switch (request['event']) {
         case 'switchServer':
-            if (typeof request['selectTargetServer'] == 'undefined' 
-                || typeof targetServers[request['selectTargetServer']] == 'undefined' 
-                || request['selectTargetServer'] == currentTargetServer) {
-                console.log('invalid selectTargetServer');   
-                sendResponse({"state":"fail", "message":"invalid option"});
+            if (typeof request['selectTargetServer'] == 'undefined' ||
+                typeof targetServers[request['selectTargetServer']] == 'undefined' ||
+                request['selectTargetServer'] == currentTargetServer) {
+                console.log('invalid selectTargetServer');
+                sendResponse({
+                    "state": "fail",
+                    "message": "invalid option"
+                });
             } else {
-                chrome.storage.local.set({'defaultServer': request['selectTargetServer']}, function(){
+                chrome.storage.local.set({
+                    'defaultServer': request['selectTargetServer']
+                }, function () {
                     console.log('save default severs settings success');
                     currentTargetServer = request['selectTargetServer'];
-                    webSocket.ReOpen(function(){
+                    webSocket.ReOpen(function () {
                         console.log("connected target server " + targetServers[currentTargetServer] + " success");
                     });
-                    sendResponse({"state":"ok"});
+                    sendResponse({
+                        "state": "ok"
+                    });
                 });
             }
-        break;
+            break;
         case 'loadLogs':
             db.transaction(function (tx) {
                 tx.executeSql('SELECT id,title,message FROM logs order by id DESC limit 50', [], function (tx, results) {
                     console.log(results.rows);
-                    sendResponse({"state":"ok", "logs":results.rows});
+                    sendResponse({
+                        "state": "ok",
+                        "logs": results.rows
+                    });
                 }, null);
             });
-            chrome.browserAction.setBadgeText({"text":""});
+            chrome.browserAction.setBadgeText({
+                "text": ""
+            });
             tryConnectTargetServer();
-        break;
+            break;
         case 'deleteLog':
             db.transaction(function (tx) {
                 tx.executeSql('DELETE FROM logs WHERE id=?', [request['id']]);
-                sendResponse({"state":"ok"});
+                sendResponse({
+                    "state": "ok"
+                });
             });
-        break;
+            break;
         case 'addServer':
-            if (typeof request['name'] == 'undefined'
-                || typeof request['url'] == 'undefined') {
-                console.log('invalid server');   
-                sendResponse({"state":"fail", "message":"invalid server"});
+            if (typeof request['name'] == 'undefined' || typeof request['url'] == 'undefined') {
+                console.log('invalid server');
+                sendResponse({
+                    "state": "fail",
+                    "message": "invalid server"
+                });
             } else {
                 if (request['url'].indexOf("?") == -1) {
                     request['url'] += '?proxy=0&monitor=1';
@@ -229,28 +267,43 @@ chrome.runtime.onMessage.addListener(function(request, sender, sendResponse) {
                     request['url'] += '&uuid=' + sender.id;
                 }
                 targetServers[request['name']] = request['url'];
-                chrome.storage.local.set({'servers':targetServers}, function(){
+                chrome.storage.local.set({
+                    'servers': targetServers
+                }, function () {
                     console.log('save new sever settings success');
-                    sendResponse({"state":"ok", "url": request['url']});
+                    sendResponse({
+                        "state": "ok",
+                        "url": request['url']
+                    });
                 });
             }
-        break;
+            break;
         case 'deleteServer':
-            if (typeof request['name'] == 'undefined'
-                || request['name'] == currentTargetServer) {
-                console.log('invalid server');   
-                sendResponse({"state":"fail", "message":"invalid server"});
+            if (typeof request['name'] == 'undefined' ||
+                request['name'] == currentTargetServer) {
+                console.log('invalid server');
+                sendResponse({
+                    "state": "fail",
+                    "message": "invalid server"
+                });
             } else {
                 delete targetServers[request['name']];
-                chrome.storage.local.set({'servers':targetServers}, function(){
+                chrome.storage.local.set({
+                    'servers': targetServers
+                }, function () {
                     console.log('delete sever settings success');
-                    sendResponse({"state":"ok"});
+                    sendResponse({
+                        "state": "ok"
+                    });
                 });
             }
-        break;
+            break;
         default:
-            sendResponse({"state":"fail", "message":"unknown event"});
-        break;
+            sendResponse({
+                "state": "fail",
+                "message": "unknown event"
+            });
+            break;
     }
 
     return true;

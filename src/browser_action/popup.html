@@ -1,36 +1,37 @@
 <!DOCTYPE html>
 <html lang="en">
-    <head>
-        <meta charset="UTF-8">
-        <title>提醒通知</title>
-        <link rel="stylesheet" type="text/css" href="popup.css">
-    </head>
+<head>
+    <meta charset="UTF-8">
+    <title>提醒通知</title>
+    <link rel="stylesheet" type="text/css" href="popup.css">
+</head>
 <body background="../images/skin.jpg">
-<div style="width:500px;">
-    <div style="margin-top:5px;">
-        <label id="server">服务器</label>
-        <select id="selectTargetServer" style="width:230px;overflow-x:hidden;height:35px;"></select>
-        <button id="doSave" class="button-disabled" disabled>保存</button>
-        <button id="doDelete" class="button-disabled" disabled>删除</button>
-        <button id="doRefresh" class="button-enabled">刷新</button>
+    <div style="width:500px;">
+        <div style="margin-top:5px;">
+            <label id="server">服务器</label>
+            <select id="selectTargetServer" style="width:230px;overflow-x:hidden;height:35px;"></select>
+            <button id="doSave" class="button-disabled" disabled>保存</button>
+            <button id="doDelete" class="button-disabled" disabled>删除</button>
+            <button id="doRefresh" class="button-enabled">刷新</button>
+        </div>
+        <div style="height:400px;">
+            <ul id="output"></ul>
+        </div>
+        <div style="margin-top:5px;height:15px;">
+            <span id="tip" style="float:left;color:brown;"></span>
+            <span style="float:right;color:black;">v0.0.3</span>
+        </div>
+        <div id="options">
+            <div><label>服务器标记</label><input type="text" id="serverName" value="new-server" style="width:100px" /></div>
+            <div><label>服务器地址</label><input type="text" id="serverUrl" value="ws://" style="width:300px" /></div>
+            <div style="text-align:center;margin-top:20px"><button id="doAdd">新增</button></div>
+        </div>
+        <div style="position:absolute;top:100px;left:204px;"><canvas id="stage" width="500" height="500"></canvas></div>
     </div>
-    <div style="height:400px;">
-        <ul id="output"></ul>
-    </div>
-    <div style="margin-top:5px;height:15px;">
-        <span id="tip" style="float:left;color:brown;"></span>
-        <span style="float:right;color:black;">v0.0.3</span>
-    </div>
-    <div id="options">
-        <div><label>服务器标记</label><input type="text" id="serverName" value="new-server" style="width:100px"/></div>
-        <div><label>服务器地址</label><input type="text" id="serverUrl" value="ws://" style="width:300px"/></div>
-        <div style="text-align:center;margin-top:20px"><button id="doAdd">新增</button></div>
-    </div>
-    <div style="position:absolute;top:100px;left:204px;"><canvas id="stage" width="500" height="500"></canvas></div>
-</div>
-<script src="../libs/jquery.min.js"></script>
-<script src="../libs/clipboard.min.js"></script>
-<script src="../libs/easeljs.min.js"></script>
-<script src="popup.js"></script>
+    <script src="../libs/jquery.min.js"></script>
+    <script src="../libs/clipboard.min.js"></script>
+    <script src="../libs/easeljs.min.js"></script>
+    <script src="popup.js"></script>
 </body>
+
 </html>
